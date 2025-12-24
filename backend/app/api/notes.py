@@ -50,7 +50,7 @@ def create_note(
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
-    db_note = Note(**note.dict(), user_id=current_user.id)
+    db_note = Note(**note.model_dump(), user_id=current_user.id)
     db.add(db_note)
     db.commit()
     db.refresh(db_note)
@@ -89,7 +89,7 @@ def update_note(
         )
     
     # Update note fields
-    update_data = note.dict(exclude_unset=True)
+    update_data = note.model_dump(exclude_unset=True)
     for field, value in update_data.items():
         setattr(db_note, field, value)
     
