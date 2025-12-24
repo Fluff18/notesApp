@@ -1,26 +1,32 @@
 # Notes App
 
-A full-stack monorepo application for managing notes with authentication. Built with FastAPI (Python) backend and Next.js (React/TypeScript) frontend.
+Full-stack note management application with JWT authentication. Built with FastAPI (Python) and Next.js (TypeScript).
 
 ## Features
 
-### Backend
-- **REST API** with FastAPI
-- **Authentication** using JWT tokens and bcrypt password hashing
-- **Database** PostgreSQL with SQLAlchemy ORM
-- **Migrations** with Alembic
-- **CORS** configured for frontend communication
-- **Note Ownership** enforcement at API level
-- **Comprehensive Tests** with pytest
+**Backend**
+- REST API with FastAPI & SQLAlchemy ORM
+- JWT authentication with bcrypt password hashing
+- PostgreSQL database with Alembic migrations
+- Note ownership enforcement
+- 19 pytest tests (100% passing)
 
-### Frontend
-- **Modern UI** built with Next.js 14 and React 18
-- **TypeScript** for type safety
-- **Authentication** pages (signup/login)
-- **Notes Dashboard** with full CRUD operations
-- **JWT Management** in localStorage
-- **Loading & Error States** for better UX
-- **Comprehensive Tests** with Jest and React Testing Library
+**Frontend**
+- Next.js 14 with React 18 & TypeScript
+- Authentication flow (signup/login)
+- Full CRUD notes dashboard
+- Loading & error states
+- 20 tests: 15 Jest unit + 5 Playwright E2E (100% passing)
+
+## Screenshots
+
+**Login Page**
+
+![Login Page](docs/images/login.png)
+
+**Notes Dashboard**
+
+![Notes Dashboard](docs/images/notes.png)
 
 ## Project Structure
 
@@ -41,212 +47,175 @@ notesApp/
 ├── frontend/         # Next.js React frontend
 │   ├── app/          # Pages and layouts
 │   ├── lib/          # API client
-│   ├── __tests__/    # Jest tests
+│   ├── __tests__/    # Jest unit tests
+│   ├── e2e/          # Playwright E2E tests
 │   ├── package.json
 │   └── README.md
 │
 └── README.md         # This file
 ```
 
-## Prerequisites
-
-- **Backend:**
-  - Python 3.10+
-  - Docker & Docker Compose (for PostgreSQL)
-
-- **Frontend:**
-  - Node.js 18+
-  - npm
-
 ## Quick Start
 
-### 1. Start the Backend
+**Prerequisites:** Python 3.9+, Node.js 18+, PostgreSQL
+
+### Backend Setup
 
 ```bash
-# Navigate to backend directory
 cd backend
+python3 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt  # Includes pytest and all test dependencies
 
-# Create virtual environment
-python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
+# Setup PostgreSQL
+brew install postgresql@14
+brew services start postgresql@14
+createdb notesapp
 
-# Install dependencies
-pip install -r requirements.txt
-
-# Copy environment file
+# Configure environment
 cp .env.example .env
-# Edit .env and update SECRET_KEY for production
+# Update DATABASE_URL in .env
 
-# Start PostgreSQL with Docker
-docker-compose up -d
-
-# Run database migrations
+# Run migrations and start server
 alembic upgrade head
-
-# Start the backend server
-uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
-```
-
-Backend will be running at http://localhost:8000
-
-### 2. Start the Frontend
-
-```bash
-# Navigate to frontend directory (in a new terminal)
-cd frontend
-
-# Install dependencies
-npm install
-
-# Start the development server
-npm run dev
-```
-
-Frontend will be running at http://localhost:3000
-
-## API Documentation
-
-Once the backend is running, visit:
-- Swagger UI: http://localhost:8000/docs
-- ReDoc: http://localhost:8000/redoc
-
-## API Endpoints
-
-### Authentication
-- `POST /auth/signup` - Register a new user
-- `POST /auth/login` - Login and receive JWT token
-
-### Notes (require authentication)
-- `POST /notes` - Create a new note
-- `GET /notes` - Get all notes for the authenticated user
-- `PUT /notes/{id}` - Update a note (owner only)
-- `DELETE /notes/{id}` - Delete a note (owner only)
-
-## Running Tests
-
-### Backend Tests
-```bash
-cd backend
-source venv/bin/activate
-pytest
-```
-
-### Frontend Tests
-```bash
-cd frontend
-npm test
-```
-
-## Technology Stack
-
-### Backend
-- FastAPI - Modern Python web framework
-- SQLAlchemy - SQL toolkit and ORM
-- Alembic - Database migration tool
-- PostgreSQL - Relational database
-- Pydantic - Data validation
-- python-jose - JWT tokens
-- passlib - Password hashing
-- pytest - Testing framework
-
-### Frontend
-- Next.js 14 - React framework
-- React 18 - UI library
-- TypeScript - Type safety
-- Jest - Testing framework
-- React Testing Library - Component testing
-
-## Security Features
-
-- Passwords hashed with bcrypt
-- JWT-based authentication
-- CORS protection
-- Note ownership enforcement
-- SQL injection protection via SQLAlchemy
-- Input validation with Pydantic
-
-## Development
-
-### Backend Development
-```bash
-cd backend
-source venv/bin/activate
 uvicorn app.main:app --reload
 ```
 
-### Frontend Development
+Backend runs at `http://localhost:8000` • Docs at `http://localhost:8000/docs`
+
+### Frontend Setup
+
 ```bash
 cd frontend
+npm install  # Includes Jest, Playwright, and all test dependencies
 npm run dev
 ```
 
-### Database Management
+Frontend runs at `http://localhost:3000`
+
+## Testing
+
+### Test Dependencies Installation
+
+**Backend test dependencies** are automatically installed with:
 ```bash
 cd backend
-
-# Create new migration
-alembic revision --autogenerate -m "description"
-
-# Apply migrations
-alembic upgrade head
-
-# Rollback migration
-alembic downgrade -1
+source venv/bin/activate
+pip install -r requirements.txt
 ```
 
-## Environment Variables
+This includes:
+- `pytest` - Testing framework
+- `pytest-asyncio` - Async test support
+- `httpx` - HTTP client for API testing
 
-### Backend (.env)
-```
-DATABASE_URL=postgresql://notesapp:notesapp123@localhost:5432/notesapp
-SECRET_KEY=your-secret-key-change-in-production
-ALGORITHM=HS256
-ACCESS_TOKEN_EXPIRE_MINUTES=30
-```
-
-### Frontend (.env.local)
-```
-NEXT_PUBLIC_API_URL=http://localhost:8000
+**Frontend test dependencies** are automatically installed with:
+```bash
+cd frontend
+npm install
 ```
 
-## Production Deployment
+This includes:
+- `jest` - Unit testing framework
+- `@testing-library/react` - React component testing
+- `@testing-library/jest-dom` - DOM matchers
+- `@playwright/test` - E2E testing framework
 
-### Backend
-1. Update SECRET_KEY in .env
-2. Set up production PostgreSQL database
-3. Update DATABASE_URL
-4. Run migrations: `alembic upgrade head`
-5. Use a production ASGI server (e.g., gunicorn with uvicorn workers)
+### Running Tests
 
-### Frontend
-1. Build the application: `npm run build`
-2. Start production server: `npm start`
-3. Or deploy to Vercel/Netlify
+#### Backend Tests (19 tests)
+
+```bash
+cd backend
+source venv/bin/activate
+
+# Run all tests
+pytest
+
+# Run with verbose output
+pytest -v
+
+# Run specific test file
+pytest app/tests/test_auth.py
+pytest app/tests/test_notes.py
+
+# Run with coverage report
+pytest --cov=app --cov-report=html
+```
+
+**Test Breakdown:**
+- **Authentication Tests (7)**: Signup, login, validation, error handling
+- **Notes API Tests (12)**: CRUD operations, authorization, ownership validation
+
+#### Frontend Unit Tests (15 tests)
+
+```bash
+cd frontend
+
+# Run all unit tests
+npm test
+
+# Run in watch mode
+npm run test:watch
+
+# Run specific test file
+npm test -- login.test.tsx
+```
+
+**Test Breakdown:**
+- **Login Component (4)**: Form rendering, authentication flow, error states
+- **Signup Component (4)**: Registration, validation, error handling
+- **Notes Dashboard (7)**: CRUD operations, authentication checks, error handling
+
+#### Frontend E2E Tests (5 tests)
+
+```bash
+cd frontend
+
+# Run E2E tests (headless)
+npm run test:e2e
+
+# Run with interactive UI (for debugging)
+npm run test:e2e:ui
+
+# Run in headed mode (watch browser)
+npm run test:e2e:headed
+
+# View detailed test report
+npm run test:report
+```
+
+**Test Scenarios:**
+1. Complete user journey (signup → login → notes access)
+2. Login validation and error handling
+3. Protected route authentication
+4. Full CRUD workflow (create → read → update → delete)
+5. Multiple notes management
+
+### Test Coverage Summary
+
+| Type | Count | Framework | Coverage | Status |
+|------|-------|-----------|----------|--------|
+| Backend Unit/Integration | 19 | pytest | API routes, auth, DB | ✅ |
+| Frontend Unit | 15 | Jest + RTL | Components, logic | ✅ |
+| Frontend E2E | 5 | Playwright | User workflows | ✅ |
+| **Total** | **39** | - | **Full stack** | **✅** |
+
+**All tests passing with 100% success rate.**
+
+## Technology Stack
+
+**Backend:** FastAPI • SQLAlchemy • PostgreSQL • Alembic • JWT • Bcrypt  
+**Frontend:** Next.js 14 • React 18 • TypeScript • Jest • Playwright
 
 ## Troubleshooting
 
-### Backend Issues
-- **Database connection error**: Ensure PostgreSQL is running (`docker-compose up -d`)
-- **Migration errors**: Check database credentials in .env
-- **Import errors**: Ensure virtual environment is activated
+**Backend**
+- Database connection error: `brew services list` to check PostgreSQL
+- Port 8000 in use: `lsof -ti:8000 | xargs kill -9`
 
-### Frontend Issues
-- **API connection error**: Verify backend is running on port 8000
-- **Build errors**: Clear `.next` directory and rebuild
-- **Test failures**: Ensure all dependencies are installed
+**Frontend**
+- API connection error: Verify backend at `http://localhost:8000/health`
+- Port 3000 in use: `PORT=3001 npm run dev`
 
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Run tests
-5. Submit a pull request
-
-## License
-
-This project is for educational purposes.
-
-## Support
-
-For issues and questions, please open an issue on GitHub.
+---

@@ -48,8 +48,20 @@ describe('SignupPage', () => {
 
     await waitFor(() => {
       expect(api.signup).toHaveBeenCalledWith('test@example.com', 'password123');
-      expect(mockPush).toHaveBeenCalledWith('/login');
     });
+
+    // Wait for success message
+    await waitFor(() => {
+      expect(screen.getByText(/account created successfully/i)).toBeInTheDocument();
+    });
+
+    // Wait for redirect (happens after 1.5s delay)
+    await waitFor(
+      () => {
+        expect(mockPush).toHaveBeenCalledWith('/login');
+      },
+      { timeout: 2000 }
+    );
   });
 
   it('displays error on signup failure', async () => {

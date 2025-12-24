@@ -1,97 +1,60 @@
 # Notes API - Backend
 
-A FastAPI-based REST API for managing notes with JWT authentication.
-
-## Features
-
-- **Authentication**: JWT-based auth with bcrypt password hashing
-- **User Management**: Signup and login endpoints
-- **Notes CRUD**: Create, read, update, and delete notes
-- **Note Ownership**: Each user can only access their own notes
-- **Database**: PostgreSQL with SQLAlchemy ORM
-- **Migrations**: Alembic for database migrations
-- **Validation**: Pydantic models for request/response validation
-- **CORS**: Configured for frontend at http://localhost:3000
-- **Testing**: Comprehensive pytest test suite
+FastAPI REST API for managing notes with JWT authentication.
 
 ## Tech Stack
 
-- FastAPI
-- SQLAlchemy
-- Alembic
-- PostgreSQL
-- JWT (python-jose)
-- Bcrypt (passlib)
-- Pydantic
-- Pytest
+FastAPI, SQLAlchemy, Alembic, PostgreSQL, JWT (python-jose), Bcrypt, Pytest
 
 ## Prerequisites
 
-- Python 3.10+
-- Docker & Docker Compose (for PostgreSQL)
+- Python 3.9+
+- PostgreSQL
 
-## Setup
+## Quick Setup
 
-1. **Navigate to backend directory:**
-   ```bash
-   cd backend
-   ```
+```bash
+# 1. Create virtual environment
+python3 -m venv venv
+source venv/bin/activate
 
-2. **Create virtual environment:**
-   ```bash
-   python -m venv venv
-   source venv/bin/activate  # On Windows: venv\Scripts\activate
-   ```
+# 2. Install dependencies (includes pytest)
+pip install -r requirements.txt
 
-3. **Install dependencies:**
-   ```bash
-   pip install -r requirements.txt
-   ```
+# 3. Setup PostgreSQL (choose one)
+# Option A: Homebrew
+brew install postgresql@14
+brew services start postgresql@14
+createdb -U $USER notesapp
 
-4. **Set up environment variables:**
-   ```bash
-   cp .env.example .env
-   # Edit .env and update the SECRET_KEY
-   ```
+# Option B: Docker
+docker-compose up -d
 
-5. **Start PostgreSQL:**
-   ```bash
-   docker-compose up -d
-   ```
+# 4. Configure environment
+cp .env.example .env
+# Edit .env with your database credentials
 
-6. **Run database migrations:**
-   ```bash
-   alembic upgrade head
-   ```
+# 5. Run migrations
+alembic upgrade head
 
-7. **Start the development server:**
-   ```bash
-   uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
-   ```
+# 6. Start server
+uvicorn app.main:app --reload
+```
 
-The API will be available at http://localhost:8000
-
-## API Documentation
-
-Once the server is running, visit:
-- Swagger UI: http://localhost:8000/docs
-- ReDoc: http://localhost:8000/redoc
+Server runs at http://localhost:8000  
+API docs at http://localhost:8000/docs
 
 ## API Endpoints
 
-### Authentication
-- `POST /auth/signup` - Register a new user
-- `POST /auth/login` - Login and receive JWT token
+**Authentication:**
+- `POST /auth/signup` - Register new user
+- `POST /auth/login` - Login and get JWT token
 
-### Notes
-- `POST /notes` - Create a new note (requires auth)
-- `GET /notes` - Get all notes for the authenticated user
-- `PUT /notes/{id}` - Update a note (requires auth and ownership)
-- `DELETE /notes/{id}` - Delete a note (requires auth and ownership)
-
-### Health
-- `GET /` - Welcome message
-- `GET /health` - Health check
+**Notes (authenticated):**
+- `POST /notes` - Create note
+- `GET /notes` - Get user's notes
+- `PUT /notes/{id}` - Update note
+- `DELETE /notes/{id}` - Delete note
 
 ## Running Tests
 
@@ -99,81 +62,43 @@ Once the server is running, visit:
 # Run all tests
 pytest
 
-# Run with coverage
-pytest --cov=app --cov-report=html
+# Run with verbose output
+pytest -v
 
 # Run specific test file
 pytest app/tests/test_auth.py
 pytest app/tests/test_notes.py
+
+# Run with coverage report
+pytest --cov=app --cov-report=html
 ```
 
-## Database Management
+### Test Coverage (19 tests)
 
-### Create a new migration
-```bash
-alembic revision --autogenerate -m "description of changes"
-```
+**Authentication Tests** (7 tests):
+- Root endpoint and health check
+- User signup (success, duplicate email handling)
+- User login (success, invalid credentials, non-existent user)
 
-### Apply migrations
-```bash
-alembic upgrade head
-```
+**Notes API Tests** (12 tests):
+- Create note (authorized & unauthorized)
+- Get notes (authorized & unauthorized)  
+- Update note (full & partial updates, not found, unauthorized)
+- Delete note (success, not found, unauthorized)
+- Note ownership verification
 
-### Rollback migration
-```bash
-alembic downgrade -1
-```
+**All 19 backend tests passing ✅**
 
 ## Project Structure
 
 ```
 backend/
 ├── app/
-│   ├── api/           # API route handlers
-│   │   ├── auth.py    # Authentication endpoints
-│   │   └── notes.py   # Notes CRUD endpoints
-│   ├── core/          # Core functionality
-│   │   ├── config.py  # Configuration
-│   │   └── security.py # Security utilities (JWT, hashing)
+│   ├── api/           # Route handlers
+│   ├── core/          # Config and security
 │   ├── models/        # Database models
-│   │   ├── database.py # Database connection
-│   │   └── models.py   # SQLAlchemy models
 │   ├── schemas/       # Pydantic schemas
-│   │   └── schemas.py  # Request/response models
-│   ├── tests/         # Test suite
-│   │   ├── conftest.py # Test fixtures
-│   │   ├── test_auth.py # Auth tests
-│   │   └── test_notes.py # Notes tests
-│   └── main.py        # FastAPI application
+│   └── tests/         # Pytest tests
 ├── alembic/           # Database migrations
-├── docker-compose.yml # PostgreSQL container
-├── requirements.txt   # Python dependencies
-└── .env              # Environment variables
-```
-
-## Security Notes
-
-- Passwords are hashed using bcrypt before storage
-- JWT tokens are used for authentication
-- Note ownership is enforced at the API level
-- CORS is configured to only allow requests from the frontend origin
-- Change the SECRET_KEY in production
-
-## Development
-
-To stop the PostgreSQL container:
-```bash
-docker-compose down
-```
-
-To view PostgreSQL logs:
-```bash
-docker-compose logs -f db
-```
-
-To reset the database:
-```bash
-docker-compose down -v
-docker-compose up -d
-alembic upgrade head
+└── requirements.txt   # Python dependencies
 ```

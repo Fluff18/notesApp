@@ -9,17 +9,22 @@ export default function SignupPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setError('');
+    setSuccess('');
     setLoading(true);
 
     try {
       await signup(email, password);
-      router.push('/login');
+      setSuccess('Account created successfully! Redirecting to login...');
+      setTimeout(() => {
+        router.push('/login');
+      }, 1500);
     } catch (err: any) {
       setError(err.message || 'Failed to sign up');
     } finally {
@@ -31,6 +36,7 @@ export default function SignupPage() {
     <div className="auth-container">
       <h1>Sign Up</h1>
       {error && <div className="error">{error}</div>}
+      {success && <div className="success">{success}</div>}
       <form onSubmit={handleSubmit}>
         <div className="form-group">
           <label htmlFor="email">Email</label>

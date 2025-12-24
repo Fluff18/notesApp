@@ -1,4 +1,5 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import '@testing-library/jest-dom';
 import { useRouter } from 'next/navigation';
 import NotesPage from '@/app/notes/page';
 import * as api from '@/lib/api';
@@ -91,7 +92,7 @@ describe('NotesPage', () => {
       target: { value: 'New Content' },
     });
 
-    fireEvent.click(screen.getByRole('button', { name: /create note/i }));
+    fireEvent.click(screen.getByRole('button', { name: /add note/i }));
 
     await waitFor(() => {
       expect(api.createNote).toHaveBeenCalledWith('New Note', 'New Content');

@@ -109,7 +109,7 @@ export default function NotesPage() {
         {error && <div className="error">{error}</div>}
 
         <div className="create-note-form">
-          <h2>Create New Note</h2>
+          <h2>Add Note</h2>
           <form onSubmit={handleCreateNote}>
             <div className="form-group">
               <label htmlFor="title">Title</label>
@@ -135,7 +135,7 @@ export default function NotesPage() {
               />
             </div>
             <button type="submit" className="btn" disabled={creating}>
-              {creating ? 'Creating...' : 'Create Note'}
+              {creating ? 'Adding Note...' : 'Add Note'}
             </button>
           </form>
         </div>
