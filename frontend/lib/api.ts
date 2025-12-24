@@ -28,6 +28,10 @@ class ApiError extends Error {
 }
 
 const getAuthHeaders = (): HeadersInit => {
+  if (typeof window === 'undefined') {
+    return { 'Content-Type': 'application/json' };
+  }
+  
   const token = localStorage.getItem('token');
   return {
     'Content-Type': 'application/json',
@@ -103,13 +107,16 @@ export const deleteNote = async (id: number): Promise<void> => {
 
 // Auth helpers
 export const isAuthenticated = (): boolean => {
+  if (typeof window === 'undefined') return false;
   return !!localStorage.getItem('token');
 };
 
 export const setToken = (token: string): void => {
+  if (typeof window === 'undefined') return;
   localStorage.setItem('token', token);
 };
 
 export const clearToken = (): void => {
+  if (typeof window === 'undefined') return;
   localStorage.removeItem('token');
 };

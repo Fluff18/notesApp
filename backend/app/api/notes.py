@@ -121,4 +121,3 @@ def delete_note(
     
     db.delete(db_note)
     db.commit()
-    return None
