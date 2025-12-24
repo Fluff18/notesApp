@@ -57,31 +57,41 @@ notesApp/
 
 ## Quick Start
 
-**Prerequisites:** Python 3.9+, Node.js 18+, PostgreSQL
+**Prerequisites:** Python 3.9+, Node.js 18+, PostgreSQL (installed and running)
+
+> **Note:** Docker support is planned but not yet implemented. Use local PostgreSQL installation.
 
 ### Backend Setup
 
 ```bash
 cd backend
+
+# 1. Create and activate virtual environment
 python3 -m venv venv
 source venv/bin/activate
-pip install -r requirements.txt  # Includes pytest and all test dependencies
 
-# Setup PostgreSQL
+# 2. Install dependencies (includes pytest and all test dependencies)
+pip install -r requirements.txt
+
+# 3. Setup PostgreSQL (if not already installed)
 brew install postgresql@14
 brew services start postgresql@14
-createdb notesapp
+createdb -U $USER notesapp
 
-# Configure environment
-cp .env.example .env
-# Update DATABASE_URL in .env
+# Or verify PostgreSQL is running:
+psql -U $USER -d notesapp -c "SELECT 1"
 
-# Run migrations and start server
+# 4. Run database migrations
 alembic upgrade head
+
+# 5. Start the backend server
 uvicorn app.main:app --reload
 ```
 
-Backend runs at `http://localhost:8000` • Docs at `http://localhost:8000/docs`
+**Access the backend:**
+- API Server: http://localhost:8000
+- Interactive API Docs (Swagger): http://localhost:8000/docs
+- Alternative Docs (ReDoc): http://localhost:8000/redoc
 
 ### Frontend Setup
 

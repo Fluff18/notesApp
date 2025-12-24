@@ -9,7 +9,9 @@ FastAPI, SQLAlchemy, Alembic, PostgreSQL, JWT (python-jose), Bcrypt, Pytest
 ## Prerequisites
 
 - Python 3.9+
-- PostgreSQL
+- PostgreSQL (installed and running)
+
+> **Note:** Docker support is planned but not yet implemented. Use local PostgreSQL for now.
 
 ## Quick Setup
 
@@ -21,18 +23,19 @@ source venv/bin/activate
 # 2. Install dependencies (includes pytest)
 pip install -r requirements.txt
 
-# 3. Setup PostgreSQL (choose one)
-# Option A: Homebrew
+# 3. Setup PostgreSQL
+# Using Homebrew (macOS):
 brew install postgresql@14
 brew services start postgresql@14
 createdb -U $USER notesapp
 
-# Option B: Docker
-docker-compose up -d
+# Or check if PostgreSQL is already running:
+psql -U $USER -d notesapp -c "SELECT 1"
 
-# 4. Configure environment
-cp .env.example .env
-# Edit .env with your database credentials
+# 4. Configure environment (optional)
+# The app uses default PostgreSQL connection:
+# postgresql://localhost/notesapp
+# To customize, create .env file with DATABASE_URL
 
 # 5. Run migrations
 alembic upgrade head
@@ -41,8 +44,15 @@ alembic upgrade head
 uvicorn app.main:app --reload
 ```
 
-Server runs at http://localhost:8000  
-API docs at http://localhost:8000/docs
+## Accessing the Backend
+
+Once the server is running, you can access:
+
+- **API Server:** http://localhost:8000
+- **Interactive API Docs (Swagger):** http://localhost:8000/docs
+- **Alternative API Docs (ReDoc):** http://localhost:8000/redoc
+
+To test the API quickly, open http://localhost:8000/docs in your browser and use the interactive interface.
 
 ## API Endpoints
 
